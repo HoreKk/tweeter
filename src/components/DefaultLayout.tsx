@@ -1,6 +1,9 @@
+import { Nav } from './Nav';
+
 import Head from 'next/head';
 import { ReactNode } from 'react';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { Container, Box } from '@chakra-ui/react';
 
 type DefaultLayoutProps = { children: ReactNode };
 
@@ -8,11 +11,15 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
   return (
     <>
       <Head>
-        <title>Prisma Starter</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Tweeter</title>
+        <link rel="icon" href="/tweeter-small.svg" />
       </Head>
 
-      <main>{children}</main>
+      <Nav />
+
+      <Box as="main" bg="blackAlpha.50">
+        <Container h="">{children}</Container>
+      </Box>
 
       {process.env.NODE_ENV !== 'production' && (
         <ReactQueryDevtools initialIsOpen={false} />

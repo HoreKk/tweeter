@@ -9,6 +9,7 @@ import superjson from 'superjson';
 import { DefaultLayout } from '~/components/DefaultLayout';
 import { AppRouter } from '~/server/routers/_app';
 import { SSRContext } from '~/utils/trpc';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -20,7 +21,12 @@ type AppPropsWithLayout = AppProps & {
 
 const MyApp = (({ Component, pageProps }: AppPropsWithLayout) => {
   const getLayout =
-    Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
+    Component.getLayout ??
+    ((page) => (
+      <ChakraProvider>
+        <DefaultLayout>{page}</DefaultLayout>
+      </ChakraProvider>
+    ));
 
   return getLayout(<Component {...pageProps} />);
 }) as AppType;

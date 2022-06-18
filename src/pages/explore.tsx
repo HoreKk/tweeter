@@ -1,7 +1,7 @@
 import { trpc } from '../utils/trpc';
 import { NextPageWithLayout } from './_app';
 
-const IndexPage: NextPageWithLayout = () => {
+const ExplorePage: NextPageWithLayout = () => {
   const utils = trpc.useContext();
   // const postsQuery = trpc.useQuery(['post.all']);
   // const addPost = trpc.useMutation('post.add', {
@@ -19,12 +19,12 @@ const IndexPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <h1>Home</h1>
+      <h1>Explore</h1>
     </>
   );
 };
 
-export default IndexPage;
+export default ExplorePage;
 
 /**
  * If you want to statically render this page

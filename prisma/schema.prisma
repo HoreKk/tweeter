@@ -10,13 +10,64 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id    String @id @default(uuid())
-  title String
-  text  String
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  username String @unique
+  password String
+  displayName String
+  bio String
+  avatarPath String
+  bannerPath String
 
-  // To return `Date`s intact through the API we need to add data transformers
-  // https://trpc.io/docs/data-transformers
+  userTweets Tweet[]
+  comments Comment[]
+  tweets Config[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Tweet {
+  id Int @id @default(autoincrement())
+  content String
+
+  comments Comment[]
+  users Config[]
+
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Comment {
+  id Int @id @default(autoincrement())
+  content String
+
+  tweet Tweet @relation(fields: [tweetId], references: [id])
+  tweetId Int
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Config {
+  tweet Tweet @relation(fields: [tweetId], references: [id])
+  tweetId Int
+  author User @relation(fields: [authorId], references: [id])
+  authorId Int
+
+  liked Boolean @default(false)
+  likedAt DateTime?
+  bookmarked Boolean @default(false)
+  bookmarkedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@id([tweetId, authorId])
 }
