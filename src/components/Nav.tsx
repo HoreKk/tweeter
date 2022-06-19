@@ -15,11 +15,14 @@ import {
   Icon,
   Link,
   Box,
+  Skeleton,
+  SkeletonCircle,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { TriangleDownIcon, SettingsIcon } from '@chakra-ui/icons';
 import { FaUserCircle } from 'react-icons/fa';
 import { FiLogOut } from 'react-icons/fi';
+import { useSession } from 'next-auth/react';
 
 export const Nav = () => {
   const mainLinks = [
@@ -33,6 +36,8 @@ export const Nav = () => {
     { href: '/settings', label: 'Settings', icon: SettingsIcon },
     { href: '/logout', label: 'Logout', icon: FiLogOut },
   ];
+
+  const { data: session, status } = useSession();
 
   return (
     <Flex
@@ -72,14 +77,24 @@ export const Nav = () => {
           }
         >
           <HStack>
-            <Avatar
-              mr={{ base: 0, md: 1 }}
-              size="sm"
-              name="Antoine Lelong"
+            <SkeletonCircle
               borderRadius="lg"
-              src="https://bit.ly/dan-abramov"
-            />
-            <Text display={{ base: 'none', md: 'block' }}>Antoine Lelong</Text>
+              fadeDuration={2}
+              isLoaded={status !== 'loading'}
+            >
+              <Avatar
+                mr={{ base: 0, md: 1 }}
+                size="sm"
+                name={session?.user?.name ?? ''}
+                borderRadius="lg"
+                src={session?.user?.image ?? ''}
+              />
+            </SkeletonCircle>
+            <Skeleton isLoaded={status !== 'loading'} fadeDuration={2}>
+              <Text minW={18} display={{ base: 'none', md: 'block' }}>
+                {session?.user?.name ?? ''}
+              </Text>
+            </Skeleton>
           </HStack>
         </MenuButton>
         <MenuList px={2} py={3} rounded="xl">

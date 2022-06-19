@@ -2,33 +2,42 @@ import { httpBatchLink } from '@trpc/client/links/httpBatchLink';
 import { loggerLink } from '@trpc/client/links/loggerLink';
 import { withTRPC } from '@trpc/next';
 import { NextPage } from 'next';
-import { AppProps } from 'next/app';
 import { AppType } from 'next/dist/shared/lib/utils';
 import { ReactElement, ReactNode } from 'react';
 import superjson from 'superjson';
 import { DefaultLayout } from '~/components/DefaultLayout';
 import { AppRouter } from '~/server/routers/_app';
 import { SSRContext } from '~/utils/trpc';
-import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { Session } from 'next-auth';
+import { SessionProvider } from 'next-auth/react';
+import type { AppProps } from 'next/app';
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
+  session?: Session;
 };
 
-type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
-};
+// type AppPropsWithLayout = {
+//   Component: NextPageWithLayout;
+//   pageProps: {
+//     session: Session;
+//   };
+// };
 
-const MyApp = (({ Component, pageProps }: AppPropsWithLayout) => {
-  const getLayout =
-    Component.getLayout ??
-    ((page) => (
-      <ChakraProvider>
-        <DefaultLayout>{page}</DefaultLayout>
-      </ChakraProvider>
-    ));
-
-  return getLayout(<Component {...pageProps} />);
+const MyApp = (({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppProps) => {
+  return (
+    <ChakraProvider>
+      <SessionProvider session={session}>
+        <DefaultLayout>
+          <Component {...pageProps} />
+        </DefaultLayout>
+      </SessionProvider>
+    </ChakraProvider>
+  );
 }) as AppType;
 
 function getBaseUrl() {

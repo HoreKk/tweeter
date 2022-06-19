@@ -13,28 +13,28 @@ import { prisma } from '~/server/prisma';
  * It's important to always explicitly say which fields you want to return in order to not leak extra information
  * @see https://github.com/prisma/prisma/issues/9353
  */
-const defaultPostSelect = Prisma.validator<Prisma.PostSelect>()({
+const defaultTweetSelect = Prisma.validator<Prisma.TweetSelect>()({
   id: true,
-  title: true,
-  text: true,
+  content: true,
+  authorId: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const postRouter = createRouter()
+export const tweetRouter = createRouter()
   // create
   .mutation('add', {
     input: z.object({
       id: z.string().uuid().optional(),
-      title: z.string().min(1).max(32),
-      text: z.string().min(1),
+      content: z.string().min(1).max(100),
+      authorId: z.string(),
     }),
     async resolve({ input }) {
-      const post = await prisma.post.create({
+      const tweet = await prisma.tweet.create({
         data: input,
-        select: defaultPostSelect,
+        select: defaultTweetSelect,
       });
-      return post;
+      return tweet;
     },
   })
   // read
@@ -45,8 +45,8 @@ export const postRouter = createRouter()
        * @link https://trpc.io/docs/useInfiniteQuery
        */
 
-      return prisma.post.findMany({
-        select: defaultPostSelect,
+      return prisma.tweet.findMany({
+        select: defaultTweetSelect,
       });
     },
   })
@@ -56,17 +56,17 @@ export const postRouter = createRouter()
     }),
     async resolve({ input }) {
       const { id } = input;
-      const post = await prisma.post.findUnique({
+      const tweet = await prisma.tweet.findUnique({
         where: { id },
-        select: defaultPostSelect,
+        select: defaultTweetSelect,
       });
-      if (!post) {
+      if (!tweet) {
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: `No post with id '${id}'`,
+          message: `No tweet with id '${id}'`,
         });
       }
-      return post;
+      return tweet;
     },
   })
   // update
@@ -74,18 +74,17 @@ export const postRouter = createRouter()
     input: z.object({
       id: z.string().uuid(),
       data: z.object({
-        title: z.string().min(1).max(32).optional(),
-        text: z.string().min(1).optional(),
+        content: z.string().min(1).max(100).optional(),
       }),
     }),
     async resolve({ input }) {
       const { id, data } = input;
-      const post = await prisma.post.update({
+      const tweet = await prisma.tweet.update({
         where: { id },
         data,
-        select: defaultPostSelect,
+        select: defaultTweetSelect,
       });
-      return post;
+      return tweet;
     },
   })
   // delete
@@ -95,7 +94,7 @@ export const postRouter = createRouter()
     }),
     async resolve({ input }) {
       const { id } = input;
-      await prisma.post.delete({ where: { id } });
+      await prisma.tweet.delete({ where: { id } });
       return {
         id,
       };

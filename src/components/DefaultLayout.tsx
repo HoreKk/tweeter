@@ -18,7 +18,7 @@ export const DefaultLayout = ({ children }: DefaultLayoutProps) => {
       <Nav />
 
       <Box as="main" bg="blackAlpha.50">
-        <Container h="">{children}</Container>
+        <Container maxW="5xl">{children}</Container>
       </Box>
 
       {process.env.NODE_ENV !== 'production' && (
