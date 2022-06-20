@@ -3,16 +3,17 @@ import type { ComponentStyleConfig } from '@chakra-ui/react';
 
 export function BoxBase(props: {
   children?: React.ReactNode;
-  headingText?: string;
+  headingtext?: string;
+  [key: string]: any;
 }) {
   const styles = useStyleConfig('BoxBaseComponent');
 
   // Pass the computed styles into the `__css` prop
   return (
-    <Box __css={styles}>
-      {props.headingText && (
+    <Box __css={styles} {...props}>
+      {props.headingtext && (
         <>
-          <Heading size="xs">{props.headingText}</Heading>
+          <Heading size="xs">{props.headingtext}</Heading>
           <Divider mt={2} mb={3} />
         </>
       )}

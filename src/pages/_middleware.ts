@@ -6,7 +6,11 @@ export async function middleware(req: NextRequest) {
 
   console.log(req.nextUrl.pathname);
 
-  if (!session && !req.nextUrl.pathname.startsWith('/api/trpc')) {
+  if (
+    !session &&
+    !req.nextUrl.pathname.startsWith('/api/trpc') &&
+    !req.nextUrl.pathname.startsWith('/api/auth')
+  ) {
     return NextResponse.redirect(
       new URL(`/api/auth/signin?from=${req.nextUrl.pathname}`, req.url),
     );

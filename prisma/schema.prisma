@@ -78,10 +78,12 @@ model Comment {
   id String @id @default(cuid())
   content String
 
-  tweet Tweet @relation(fields: [tweetId], references: [id])
+  tweet Tweet @relation(fields: [tweetId], references: [id], onDelete: Cascade)
   tweetId String
   author User @relation(fields: [authorId], references: [id])
   authorId String
+
+  nbLikes Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

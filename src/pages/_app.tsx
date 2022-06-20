@@ -27,6 +27,7 @@ export type NextPageWithLayout = NextPage & {
 // };
 
 const theme = extendTheme({
+  useSystemColorMode: true,
   components: {
     BoxBaseComponent,
   },

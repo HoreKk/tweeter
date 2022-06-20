@@ -1,4 +1,4 @@
-import { Nav } from './Nav';
+import { Nav } from './core/Nav';
 
 import Head from 'next/head';
 import { ReactNode } from 'react';

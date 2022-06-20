@@ -13,31 +13,32 @@ import { prisma } from '~/server/prisma';
  * It's important to always explicitly say which fields you want to return in order to not leak extra information
  * @see https://github.com/prisma/prisma/issues/9353
  */
-const defaultTweetSelect = Prisma.validator<Prisma.TweetSelect>()({
+const defaultCommentSelect = Prisma.validator<Prisma.CommentSelect>()({
   id: true,
   content: true,
   authorId: true,
   author: true,
-  comments: true,
-  users: true,
+  tweetId: true,
+  tweet: true,
   createdAt: true,
   updatedAt: true,
 });
 
-export const tweetRouter = createRouter()
+export const commentRouter = createRouter()
   // create
   .mutation('add', {
     input: z.object({
       id: z.string().uuid().optional(),
       content: z.string().min(1).max(100),
       authorId: z.string(),
+      tweetId: z.string(),
     }),
     async resolve({ input }) {
-      const tweet = await prisma.tweet.create({
+      const comment = await prisma.comment.create({
         data: input,
-        select: defaultTweetSelect,
+        select: defaultCommentSelect,
       });
-      return tweet;
+      return comment;
     },
   })
   // read
@@ -48,31 +49,31 @@ export const tweetRouter = createRouter()
        * @link https://trpc.io/docs/useInfiniteQuery
        */
 
-      return prisma.tweet.findMany({
-        select: defaultTweetSelect,
+      return prisma.comment.findMany({
+        select: defaultCommentSelect,
         orderBy: {
           createdAt: 'desc',
         },
       });
     },
   })
-  .query('byId', {
+  .query('byTweetId', {
     input: z.object({
-      id: z.string(),
+      tweetId: z.string(),
     }),
     async resolve({ input }) {
-      const { id } = input;
-      const tweet = await prisma.tweet.findUnique({
-        where: { id },
-        select: defaultTweetSelect,
+      const { tweetId } = input;
+      const comments = await prisma.comment.findMany({
+        where: { tweetId: tweetId },
+        select: defaultCommentSelect,
       });
-      if (!tweet) {
+      if (!comments) {
         throw new TRPCError({
           code: 'NOT_FOUND',
-          message: `No tweet with id '${id}'`,
+          message: `No comments with tweetId '${tweetId}'`,
         });
       }
-      return tweet;
+      return comments;
     },
   })
   // update
@@ -88,7 +89,7 @@ export const tweetRouter = createRouter()
       const tweet = await prisma.tweet.update({
         where: { id },
         data,
-        select: defaultTweetSelect,
+        select: defaultCommentSelect,
       });
       return tweet;
     },

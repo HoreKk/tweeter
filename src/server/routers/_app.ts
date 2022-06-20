@@ -3,6 +3,7 @@
  */
 import { createRouter } from '../createRouter';
 import { tweetRouter } from './tweet';
+import { commentRouter } from './comment';
 import superjson from 'superjson';
 
 /**
@@ -31,8 +32,12 @@ export const appRouter = createRouter()
     },
   })
   /**
-   * Merge `postRouter` under `post.`
+   * Merge `tweetRouter` under `tweet.`
    */
-  .merge('tweet.', tweetRouter);
+  .merge('tweet.', tweetRouter)
+  /**
+   * Merge `commentRouter` under `comment.`
+   */
+  .merge('comment.', commentRouter);
 
 export type AppRouter = typeof appRouter;

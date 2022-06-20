@@ -2,17 +2,10 @@ import { trpc } from '../utils/trpc';
 import { NextPageWithLayout } from './_app';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
-import {
-  Heading,
-  Flex,
-  SkeletonCircle,
-  Avatar,
-  Grid,
-  GridItem,
-  Textarea,
-  Button,
-} from '@chakra-ui/react';
+import { Flex, Grid, GridItem, Textarea, Button } from '@chakra-ui/react';
 import { BoxBase } from '~/components/chakra/BoxBase';
+import { Tweet } from '~/components/Tweet';
+import { AvatarUser } from '~/components/User';
 
 const IndexPage: NextPageWithLayout = () => {
   const utils = trpc.useContext();
@@ -44,21 +37,9 @@ const IndexPage: NextPageWithLayout = () => {
   return (
     <Grid templateColumns="repeat(12, 1fr)" gap={5}>
       <GridItem colSpan={9}>
-        <BoxBase headingText="Tweet Something">
+        <BoxBase headingtext="Tweet Something">
           <Flex>
-            <SkeletonCircle
-              borderRadius="xl"
-              fadeDuration={2}
-              size="12"
-              isLoaded={status !== 'loading'}
-            >
-              <Avatar
-                size="md"
-                name={session?.user?.name ?? ''}
-                borderRadius="lg"
-                src={session?.user?.image ?? ''}
-              />
-            </SkeletonCircle>
+            <AvatarUser session={session} status={status} />
             <Flex direction="column" w="full">
               <Textarea
                 border="none"
@@ -83,15 +64,13 @@ const IndexPage: NextPageWithLayout = () => {
             </Flex>
           </Flex>
         </BoxBase>
-        {tweetsQuery.data?.map(({ id, content }) => (
-          <BoxBase key={id}>
-            <Heading>{content}</Heading>
-          </BoxBase>
+        {tweetsQuery.data?.map((tweet) => (
+          <Tweet key={tweet.id} tweet={tweet} />
         ))}
       </GridItem>
       <GridItem colSpan={3}>
-        <BoxBase headingText="Trends for you" />
-        <BoxBase headingText="Who to follow" />
+        <BoxBase headingtext="Trends for you" />
+        <BoxBase headingtext="Who to follow" />
       </GridItem>
     </Grid>
   );
