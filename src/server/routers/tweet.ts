@@ -47,6 +47,9 @@ export const tweetRouter = createRouter()
 
       return prisma.tweet.findMany({
         select: defaultTweetSelect,
+        orderBy: {
+          createdAt: 'desc',
+        },
       });
     },
   })

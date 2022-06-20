@@ -3,8 +3,6 @@ import { NextPageWithLayout } from './_app';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import {
-  Box,
-  Divider,
   Heading,
   Flex,
   SkeletonCircle,
@@ -14,6 +12,7 @@ import {
   Textarea,
   Button,
 } from '@chakra-ui/react';
+import { BoxBase } from '~/components/chakra/BoxBase';
 
 const IndexPage: NextPageWithLayout = () => {
   const utils = trpc.useContext();
@@ -30,36 +29,22 @@ const IndexPage: NextPageWithLayout = () => {
   const [newTweet, setNewTweet] = useState('');
 
   const handleNewTweet = async () => {
-    const input = {
-      content: newTweet,
-      authorId: session.user.id,
-    };
+    // refactor to get session by props
+    if (status === 'authenticated' && newTweet && /[a-zA-Z]/.test(newTweet)) {
+      const input = {
+        content: newTweet,
+        authorId: session.user.id,
+      };
 
-    await addPost.mutateAsync(input);
-
-    setNewTweet('');
+      await addPost.mutateAsync(input);
+      setNewTweet('');
+    }
   };
-
-  // useEffect(() => {
-  //   for (const { id } of postsQuery.data ?? []) {
-  //     utils.prefetchQuery(['post.byId', { id }]);
-  //   }
-  // }, [postsQuery.data, utils]);
 
   return (
     <Grid templateColumns="repeat(12, 1fr)" gap={5}>
       <GridItem colSpan={9}>
-        <Box
-          boxShadow="base"
-          bg="white"
-          borderRadius="xl"
-          px={4}
-          py={3}
-          my={5}
-          w="full"
-        >
-          <Heading size="xs">Tweet Something</Heading>
-          <Divider mt={2} mb={3} />
+        <BoxBase headingText="Tweet Something">
           <Flex>
             <SkeletonCircle
               borderRadius="xl"
@@ -80,58 +65,36 @@ const IndexPage: NextPageWithLayout = () => {
                 size="lg"
                 _focus={{ boxShadow: 'none' }}
                 value={newTweet}
-                onChange={(e) => setNewTweet(e.target.value)}
                 placeholder="What’s happening?"
                 resize="none"
+                onChange={(e) => setNewTweet(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleNewTweet()}
               />
               <Flex justify="end" mt={3}>
-                <Button colorScheme="blue" px={6} onClick={handleNewTweet}>
+                <Button
+                  colorScheme="blue"
+                  type="submit"
+                  px={6}
+                  onClick={handleNewTweet}
+                >
                   Tweet
                 </Button>
               </Flex>
             </Flex>
           </Flex>
-        </Box>
-        {tweetsQuery.data?.map((item) => (
-          <article key={item.id}>
-            <h3>{item.content}</h3>
-          </article>
+        </BoxBase>
+        {tweetsQuery.data?.map(({ id, content }) => (
+          <BoxBase key={id}>
+            <Heading>{content}</Heading>
+          </BoxBase>
         ))}
       </GridItem>
       <GridItem colSpan={3}>
-        <Box bg="white" borderRadius="lg" px={4} py={2} w="full">
-          <Heading size="xs">Tweet Something</Heading>
-          <Divider my={2} />
-        </Box>
+        <BoxBase headingText="Trends for you" />
+        <BoxBase headingText="Who to follow" />
       </GridItem>
     </Grid>
   );
 };
 
 export default IndexPage;
-
-/**
- * If you want to statically render this page
- * - Export `appRouter` & `createContext` from [trpc].ts
- * - Make the `opts` object optional on `createContext()`
- *
- * @link https://trpc.io/docs/ssg
- */
-// export const getStaticProps = async (
-//   context: GetStaticPropsContext<{ filter: string }>,
-// ) => {
-//   const ssg = createSSGHelpers({
-//     router: appRouter,
-//     ctx: await createContext(),
-//   });
-//
-//   await ssg.fetchQuery('post.all');
-//
-//   return {
-//     props: {
-//       trpcState: ssg.dehydrate(),
-//       filter: context.params?.filter ?? 'all',
-//     },
-//     revalidate: 1,
-//   };
-// };

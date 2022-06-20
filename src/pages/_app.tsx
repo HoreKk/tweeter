@@ -8,10 +8,11 @@ import superjson from 'superjson';
 import { DefaultLayout } from '~/components/DefaultLayout';
 import { AppRouter } from '~/server/routers/_app';
 import { SSRContext } from '~/utils/trpc';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { Session } from 'next-auth';
 import { SessionProvider } from 'next-auth/react';
 import type { AppProps } from 'next/app';
+import { BoxBaseComponent } from '~/components/chakra/BoxBase';
 
 export type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -25,12 +26,18 @@ export type NextPageWithLayout = NextPage & {
 //   };
 // };
 
+const theme = extendTheme({
+  components: {
+    BoxBaseComponent,
+  },
+});
+
 const MyApp = (({
   Component,
   pageProps: { session, ...pageProps },
 }: AppProps) => {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <SessionProvider session={session}>
         <DefaultLayout>
           <Component {...pageProps} />
