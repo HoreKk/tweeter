@@ -9,7 +9,7 @@ import { createRouter } from '~/server/createRouter';
 import { prisma } from '~/server/prisma';
 
 /**
- * Default selector for Post.
+ * Default selector for Tweet.
  * It's important to always explicitly say which fields you want to return in order to not leak extra information
  * @see https://github.com/prisma/prisma/issues/9353
  */
@@ -18,7 +18,7 @@ const defaultTweetSelect = Prisma.validator<Prisma.TweetSelect>()({
   content: true,
   authorId: true,
   author: true,
-  comments: true,
+  comments: { include: { author: true }, orderBy: { createdAt: 'desc' } },
   users: true,
   createdAt: true,
   updatedAt: true,

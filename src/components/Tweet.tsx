@@ -24,7 +24,7 @@ import { trpc } from '../utils/trpc';
 type TweetFull = Prisma.TweetGetPayload<{
   include: {
     author: true;
-    comments: true;
+    comments: { include: { author: true } };
     users: true;
   };
 }>;
@@ -34,21 +34,16 @@ type DefaultLayoutProps = {
 };
 
 export const Tweet = ({ tweet }: DefaultLayoutProps) => {
-  const utils = trpc.useContext();
+  //const utils = trpc.useContext();
   const { data: session, status } = useSession({ required: true });
   const [isLoaded, setIsLoaded] = useState(false);
 
   const [newComment, setNewComment] = useState('');
 
-  const commentsQuery = trpc.useQuery([
-    'comment.byTweetId',
-    { tweetId: tweet.id },
-  ]);
-
   const addComment = trpc.useMutation('comment.add', {
-    async onSuccess() {
-      // refetches posts after a post is added
-      await utils.invalidateQueries(['comment.byTweetId']);
+    async onSuccess(comment) {
+      // add new comment to the list at the beginning
+      tweet.comments.unshift(comment);
     },
   });
 
@@ -152,8 +147,8 @@ export const Tweet = ({ tweet }: DefaultLayoutProps) => {
             onKeyPress={(e) => e.key === 'Enter' && handleNewComment()}
           />
         </Flex>
-        {commentsQuery.data?.map((comment, index) => (
-          <>
+        {tweet.comments?.map((comment, index) => (
+          <Box key={comment.id}>
             {index === 0 && <Divider />}
             <Flex key={comment.id} mt={index === 0 ? 4 : 6}>
               <AvatarUser session={comment.author} />
@@ -171,6 +166,7 @@ export const Tweet = ({ tweet }: DefaultLayoutProps) => {
                     as="p"
                     color="gray.600"
                     mt={1}
+                    mb={2}
                     style={{
                       whiteSpace: 'pre-wrap',
                       overflowWrap: 'break-word',
@@ -181,7 +177,7 @@ export const Tweet = ({ tweet }: DefaultLayoutProps) => {
                 </Box>
               </Flex>
             </Flex>
-          </>
+          </Box>
         ))}
       </Skeleton>
     </BoxBase>
